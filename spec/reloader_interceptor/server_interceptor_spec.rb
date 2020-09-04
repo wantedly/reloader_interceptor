@@ -19,31 +19,48 @@ RSpec.describe ReloaderInterceptor::ServerInterceptor do
       response
     end
   }
-  let(:interceptor) {
-    ReloaderInterceptor::ServerInterceptor.new(
-      reloader: reloader
-    )
-  }
-  let(:reloader) { FakeReloader.new }
   let(:response) { double("response") }
 
-  context "when ReloaderInterceptor is disabled" do
-    before do
-      allow(ReloaderInterceptor).to receive(:enabled?).and_return(false)
+  context "when reloader is set" do
+    let(:interceptor) {
+      ReloaderInterceptor::ServerInterceptor.new(
+        reloader: reloader
+      )
+    }
+    let(:reloader) { FakeReloader.new }
+
+    context "when ReloaderInterceptor is disabled" do
+      before do
+        allow(ReloaderInterceptor).to receive(:enabled?).and_return(false)
+      end
+
+      it "does not execute reloader" do
+        expect(subject).to eq response
+        expect(reloader.reloaded).to eq false
+      end
     end
 
-    it "does not execute reloader.run!" do
-      expect(subject).to eq response
-      expect(reloader.reloaded).to eq false
+    context "when ReloaderInterceptor is enabled" do
+      before do
+        allow(ReloaderInterceptor).to receive(:enabled?).and_return(true)
+      end
+
+      it "executes reloader" do
+        expect(subject).to eq response
+        expect(reloader.reloaded).to eq true
+      end
     end
   end
 
-  context "when ReloaderInterceptor is enabled" do
-    before do
-      allow(ReloaderInterceptor).to receive(:enabled?).and_return(true)
-    end
+  context "when reloader is not set" do
+    let(:interceptor) {
+      ReloaderInterceptor::ServerInterceptor.new
+    }
+    let(:reloader) { FakeReloader.new }
 
-    it "executes reloader.run!" do
+    it "uses ReloaderInterceptor.reloader" do
+      expect(ReloaderInterceptor).to receive(:reloader).and_return(reloader)
+
       expect(subject).to eq response
       expect(reloader.reloaded).to eq true
     end
