@@ -58,11 +58,14 @@ module ReloaderInterceptor
         Class.new(klass.superclass) do
           extend Wrapper::DSL
 
-          # Define `.name` and `.inspect` to mimic the original class.
+          # Define `.name`, `.inspect`, and `.to_s` to mimic the original class.
           self.define_singleton_method :name do
             klass_name
           end
           self.define_singleton_method :inspect do
+            klass_name
+          end
+          self.define_singleton_method :to_s do
             klass_name
           end
 
