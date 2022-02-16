@@ -41,8 +41,10 @@ RSpec.describe ReloaderInterceptor::Wrapper do
       expect(src_class).to receive(:private_singleton_method)
       dst_class.send(:private_singleton_method)
 
-      # Test .name
+      # Test mimicked methods
       expect(dst_class.name).to eq src_class.name
+      expect(dst_class.inspect).to eq src_class.name
+      expect(dst_class.to_s).to eq src_class.name
     end
   end
 end
